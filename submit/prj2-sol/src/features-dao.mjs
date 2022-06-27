@@ -28,11 +28,35 @@ export default async function makeFeaturesDao(dbUrl) {
 
  }//close of func setup
 
-async close(){
+async close(obj){
 MongoClient.close();
 console.log('connection closed.');
 
 }	// close of function close()
+
+async add(features, label)
+{
+console.log('In add****');
+console.log('features => '+features);
+const b64 = uint8ArrayToB64(features);
+console.log('b64 => '+b64);
+const generator = await idGenerator();
+console.log('generator => '+generator);
+const featuresId = 'featuresData_'+generator.next().value;
+console.log('featuresId => '+featuresId);
+const obj = {id: featuresId, data: b64, label: label};
+  console.log('obj => '+obj);
+  db.featuresCollection.insertOne(obj);
+
+  return {hasErrors: false, val: featuresId};
+}//close of add func
+
+async * idGenerator(){
+let i = 1;
+while(true)
+   yield i++;
+}//end of idgenerator
+
 } //close of class
 //console.log('In makeFeaturesDao');
 //  return err('unimplemented makeFeaturesDao()', { code: 'UNIMP' });
