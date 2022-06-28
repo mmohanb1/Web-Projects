@@ -51,7 +51,7 @@ const featureId = await this.nextFeatureId();
 
 console.log('featureId => '+featureId);
 
-const obj = {_id: featureId, features: b64, label: label};
+const obj = {_id: featureId, isB64: isB64, features: b64, label: label};
 try {
       const collection = this.features;
       const insertResult = await collection.insertOne(obj);
@@ -67,6 +67,27 @@ try {
     return ok({hasErrors: false, val: featureId}.val);
 }//close of add func
 
+async get(featureId) {
+    try {
+      const collection = this.features;
+      const dbEntry = await collection.findOne({_id: featureId});
+      console.log('In Get, dbEntry => '+dbEntry);
+      if (dbEntry) {
+	const feature = { ...dbEntry };
+	feature.features = !feature.isB64 ? b64ToUint8Array(feature.features) : feature.features;
+	feature.hasErrors = false;
+      console.log('In Gets if condition******************');
+
+	return ok(feature);
+      }
+      else {
+	return err(`no feature for id '${featureId}'`, { code: 'NOT_FOUND' });
+      }
+    }
+    catch (e) {
+      return err(e.message, { code: 'DB' });
+    }
+  }
 async nextFeatureId() {
     const query = { _id: NEXT_ID_KEY };
     const update = { $inc: { [NEXT_ID_KEY]: 1 } };
