@@ -49,7 +49,7 @@ const b64 = isB64 ? features : uint8ArrayToB64(features);
 
 const featureId = await this.nextFeatureId();
 
-console.log('featureId => '+featureId);
+//console.log('featureId => '+featureId);
 
 const obj = {_id: featureId, isB64: isB64, features: b64, label: label};
 try {
@@ -67,16 +67,16 @@ try {
     return ok({hasErrors: false, val: featureId}.val);
 }//close of add func
 
-async get(featureId) {
+async get(featureId, isB64) {
     try {
       const collection = this.features;
       const dbEntry = await collection.findOne({_id: featureId});
-      console.log('In Get, dbEntry => '+dbEntry);
+   //   console.log('In Get, dbEntry => '+dbEntry);
       if (dbEntry) {
 	const feature = { ...dbEntry };
-	feature.features = !feature.isB64 ? b64ToUint8Array(feature.features) : feature.features;
+	feature.features = !isB64 ? b64ToUint8Array(feature.features) : feature.features;
 	feature.hasErrors = false;
-      console.log('In Gets if condition******************');
+  //    console.log('In Gets if condition******************');
 
 	return ok(feature);
       }
@@ -88,6 +88,35 @@ async get(featureId) {
       return err(e.message, { code: 'DB' });
     }
   }
+async getAllTrainingFeatures(){
+     
+try{
+      const collection = this.features;
+
+      const cursorArr = await collection.find({label: {$exists: true}, $expr: {$gt: [{$strLenCP: '$label'}, 0]}}).toArray();
+
+      const newArr = new Array();
+      console.log('cursorArr.length = '+cursorArr.length);
+      console.log('In getAllTrainingFeatures....');
+      for(var i=0; i<cursorArr.length; i++)
+      {
+
+	cursorArr[i].features = !cursorArr[i].isB64 ? b64ToUint8Array(cursorArr[i].features) : cursorArr[i].features;
+	      console.log('cursorArr[i].features => '+cursorArr[i].features);
+	newArr.push({features: cursorArr[i].features, label: cursorArr[i].label});
+      }
+      console.log('newArr.length = '+newArr.length);
+      const obj = {};
+      obj.hasErrors = false;
+      obj.val = newArr;
+    return ok(obj.val);
+    }
+    
+        catch (e) {
+      return err(e.message, { code: 'DB' });
+      }
+      
+}
 async nextFeatureId() {
     const query = { _id: NEXT_ID_KEY };
     const update = { $inc: { [NEXT_ID_KEY]: 1 } };
