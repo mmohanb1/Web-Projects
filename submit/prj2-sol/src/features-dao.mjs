@@ -43,11 +43,12 @@ err(error.message, { code: 'DB' });
 async add(features, isB64, label='')
 {
 console.log('In add****');
-console.log('features => '+features);
+//console.log('features => '+features);
 const b64 = isB64 ? features : uint8ArrayToB64(features);
-console.log('b64 => '+b64);
+//console.log('b64 => '+b64);
 
 const featureId = await this.nextFeatureId();
+
 console.log('featureId => '+featureId);
 
 const obj = {_id: featureId, features: b64, label: label};
@@ -63,7 +64,7 @@ try {
     catch(e) {
       return err(e.message, { code: 'DB' });
     }
-    return ok({featureId});
+    return ok({hasErrors: false, val: featureId}.val);
 }//close of add func
 
 async nextFeatureId() {
