@@ -86,11 +86,24 @@ describe('features DAO', () => {
   });
 
   it('should retrieve added base-64 features as Uint8Array', async () => {
-    const todo = `
-      Add test like previous test to check features added as
-      base-64 can be correctly retrieved as Uint8Array's.
-    `;
-    expect('TODO').to.equal(todo);
+    let ids = [];
+    for (const { features, label } of LABELED_FEATURES_LIST) {
+      const b64Features = uint8ArrayToB64(new Uint8Array(features));
+      const result = await dao.add(b64Features, true, label);
+      expect(result.hasErrors).to.equal(false);
+      ids.push(result.val);
+    }
+    expect(ids.length).to.equal(LABELED_FEATURES_LIST.length);
+    for (const [i, id] of ids.entries()) {
+      const result = await dao.get(id, false);
+      expect(result.hasErrors).to.equal(false);
+      const { features, label } = result.val;
+ //     expect(features).to.be.a('string');
+      const labeledFeatures = LABELED_FEATURES_LIST[i];
+      expect(Array.from(features))
+	.to.deep.equal(labeledFeatures.features);
+      expect(label).to.equal(labeledFeatures.label);
+    }
   });
 
   it('should return NOT_FOUND errors for incorrect id\'s', async () => {
