@@ -143,11 +143,23 @@ describe('features DAO', () => {
 
   
   it('should not retrieve features after clear', async () => {
-    const todo = `
-      Add test to add in features and verify that they
-      return NOT_FOUND errors after a clear.
-    `;
-    expect('TODO').to.equal(todo);
+   let added = [];
+    for (const feature of LABELED_FEATURES_LIST) {
+      const result = await dao.add(LABELED_FEATURES_LIST);
+      expect(result.hasErrors).to.equal(false);
+      added.push(result.val);
+    }
+    expect(added.length).to.equal(LABELED_FEATURES_LIST.length);
+    await dao.clear();
+    for (const u of added) {
+      const result1 = await dao.get(u.featureId);
+      expect(result1.hasErrors).to.equal(true);
+      expect(result1.errors).to.have.length(1);
+      expect(result1.errors[0].options.code).to.equal('NOT_FOUND');
+      const result2 = await dao.getAllTrainingFeatures();
+      expect(result2.errors).to.have.length(1);
+      expect(result2.errors[0].options.code).to.equal('NOT_FOUND');
+    }
   });
   
 });

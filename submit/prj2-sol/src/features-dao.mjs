@@ -94,7 +94,9 @@ try{
       const collection = this.features;
 
       const cursorArr = await collection.find({label: {$exists: true}, $expr: {$gt: [{$strLenCP: '$label'}, 0]}}).toArray();
-
+      if(cursorArr.length < 1)
+      	return err(`no training features found.`, { code: 'NOT_FOUND' });
+	
       const newArr = new Array();
       console.log('cursorArr.length = '+cursorArr.length);
       console.log('In getAllTrainingFeatures....');
@@ -117,6 +119,15 @@ try{
       }
       
 }
+  async clear() {
+    try {
+      await this.features.deleteMany({});
+      return ok();
+    }
+    catch (e) {
+      return err(e.message, { code: 'DB' });
+    }
+  }
 async nextFeatureId() {
     const query = { _id: NEXT_ID_KEY };
     const update = { $inc: { [NEXT_ID_KEY]: 1 } };
