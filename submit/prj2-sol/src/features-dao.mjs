@@ -42,6 +42,7 @@ err(error.message, { code: 'DB' });
 
 async add(features, isB64, label='')
 {
+try {
 //console.log('In add****');
 //console.log('features => '+features);
 const b64 = isB64 ? features : uint8ArrayToB64(features);
@@ -52,19 +53,21 @@ const featureId = await this.nextFeatureId();
 //console.log('featureId => '+featureId);
 
 const obj = {_id: featureId, isB64: isB64, features: b64, label: label};
-try {
+
       const collection = this.features;
       const insertResult = await collection.insertOne(obj);
       const id1 = insertResult.insertedId;
       if (id1 !== featureId) {
 	const msg = `expected inserted id '${id1}' to equal '${featureId}'`;
 	return err(msg, {code: 'DB'});
+	    
       }
+      return ok({hasErrors: false, val: featureId}.val);
     }
     catch(e) {
       return err(e.message, { code: 'DB' });
     }
-    return ok({hasErrors: false, val: featureId}.val);
+
 }//close of add func
 
 async get(featureId, isB64) {
