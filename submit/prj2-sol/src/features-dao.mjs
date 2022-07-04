@@ -42,7 +42,7 @@ err(error.message, { code: 'DB' });
 
 async add(features, isB64, label='')
 {
-console.log('In add****');
+//console.log('In add****');
 //console.log('features => '+features);
 const b64 = isB64 ? features : uint8ArrayToB64(features);
 //console.log('b64 => '+b64);
@@ -98,16 +98,16 @@ try{
       	return err(`no training features found.`, { code: 'NOT_FOUND' });
 	
       const newArr = new Array();
-      console.log('cursorArr.length = '+cursorArr.length);
-      console.log('In getAllTrainingFeatures....');
+    //  console.log('cursorArr.length = '+cursorArr.length);
+     // console.log('In getAllTrainingFeatures....');
       for(var i=0; i<cursorArr.length; i++)
       {
 
 	cursorArr[i].features = !cursorArr[i].isB64 ? b64ToUint8Array(cursorArr[i].features) : cursorArr[i].features;
-	      console.log('cursorArr[i].features => '+cursorArr[i].features);
+	   //   console.log('cursorArr[i].features => '+cursorArr[i].features);
 	newArr.push({features: cursorArr[i].features, label: cursorArr[i].label});
       }
-      console.log('newArr.length = '+newArr.length);
+   //   console.log('newArr.length = '+newArr.length);
       const obj = {};
       obj.hasErrors = false;
       obj.val = newArr;
