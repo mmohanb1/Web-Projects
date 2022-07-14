@@ -28,21 +28,23 @@ export default async function serve(knnConfig, dao, data) {
     app.locals.dao = dao;
     app.locals.base = knnConfig.base;
     app.locals.k = knnConfig.k;
-   // console.log(data);
+//    console.log(data.length);
+ //       console.log(data);
 //    console.log(`knnConfig = ${knnConfig}`);
     if (data) {
        dao.clear();
       //TODO: load data into dao
       for(const lf of data)
       {
-	const id = await dao.add(lf.features, true, lf.labels);	
+//      console.log(`lf = ${lf.features} ------------ ${lf.label}`);
+	const id = await dao.add(lf.features, false, lf.label);	
       }
       
     }
 
     //TODO: get all training results from dao and squirrel away in app.locals
     app.locals.training_images = await dao.getAllTrainingFeatures();
-//    console.log(app.locals.training_images.length);
+//  console.log(`app.locals.training_images.val = ${app.locals.training_images.val}`);
     //set up routes
     setupRoutes(app);
 
@@ -62,12 +64,11 @@ function setupRoutes(app) {
 
   //uncomment to log requested URLs on server stderr
   //app.use(doLogRequest(app));
-  console.log(`base = ${base}/images`);
-  console.log('in setup routes');
+//  console.log(`base = ${base}/images`);
+ // console.log('in setup routes');
   app.post(`${base}/images`, doPostTestImage(app));
-
   app.get(`${base}/images/:id`, doGetTestImage(app));
-
+  app.get(`${base}/labels/:id`, doKnn(app));
   
   
   //TODO: add knn routes here
@@ -100,12 +101,37 @@ function doPostTestImage(app) {
 function doGetTestImage(app) {
   return (async function(req, res) {
     try {
-    console.log(req.params.id);
+ //   console.log(req.params.id);
       const result = await app.locals.dao.get(req.params.id, true);
       if (result.hasErrors) throw result;
 //      const features = result.features;
 //console.log(result);
       res.json({features: result.val.features, label: result.val.label});
+      //res.location(userId);
+//      res.json(selfResult(req, result.val));
+    }
+    catch(err) {
+      const mapped = mapResultErrors(err);
+      res.status(mapped.status).json(mapped);
+    }
+  });
+}
+function doKnn(app) {
+  return (async function(req, res) {
+    try {
+  //  console.log(`req.params.id = ${req.params.id}`);
+      const result = await app.locals.dao.get(req.params.id, false);
+      if (result.hasErrors) throw result;
+
+      const testFeatures = result.val.features;
+    //  console.log(`testFeatures = ${testFeatures}`);
+      const trainingFeatures = app.locals.training_images.val;
+    //  console.log(`trainingFeatures.length = ${trainingFeatures.length}`);
+      const result1 = await knn(testFeatures, trainingFeatures, app.locals.k);
+    //  console.log(`result1 index of knn = ${result1.val[1]}`);
+      const trainingImageClosest = trainingFeatures[result1.val[1]];
+//console.log(result);
+      res.json({id: trainingImageClosest.id, label: trainingImageClosest.label});
       //res.location(userId);
 //      res.json(selfResult(req, result.val));
     }
