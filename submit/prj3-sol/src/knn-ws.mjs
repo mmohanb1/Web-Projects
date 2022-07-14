@@ -64,8 +64,8 @@ function setupRoutes(app) {
   //app.use(doLogRequest(app));
   console.log(`base = ${base}/images`);
   console.log('in setup routes');
-  //app.post(`${base}`, doPostTestImage(app));
-  app.post(`${base}/images`, dummyHandler(app));
+  app.post(`${base}/images`, doPostTestImage(app));
+
   app.get(`${base}/images/:id`, dummyHandler(app));
 
   
@@ -77,16 +77,19 @@ function setupRoutes(app) {
   app.use(doErrors(app));
 }
 
-function doRegisterUser(app) {
+function doPostTestImage(app) {
   return (async function(req, res) {
     try {
-      const userInfo = req.body;
-      const result = await app.locals.model.register(userInfo);
+      const testImage = req.body;
+      const result = await app.locals.dao.add(testImage, true);
       if (result.hasErrors) throw result;
-      const registeredUser = result.val;
-      const { userId } = registeredUser;
-      res.location(selfLink(req, userId));
-      res.status(STATUS.CREATED).json(selfResult(req, registeredUser, 'POST'));
+      const featureId = result.val;
+//      const { id } = featureId;
+	
+      //return {id: featureId};
+     // res.location(selfLink(req, id));
+//      res.status(STATUS.CREATED).json(selfResult(req, featureId, 'POST'));
+      res.json({id: featureId});
     }
     catch(err) {
       const mapped = mapResultErrors(err);
@@ -112,6 +115,48 @@ function dummyHandler(app) {
 
 //TODO: add real handlers
 
+
+/************************* HATEOAS Utilities ***************************/
+
+/** Return original URL for req */
+function requestUrl(req) {
+  return `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+}
+
+function selfLink(req, id=null) {
+  const url = new URL(requestUrl(req));
+  return url.pathname + (id ? `/${id}` : url.search);
+}
+
+function pageLink(req, nResults, dir) {
+  const url = new URL(requestUrl(req));
+  const count = Number(req.query?.count ?? DEFAULT_COUNT);
+  const index0 = Number(url.searchParams.get('index') ?? 0);
+  if (dir > 0 ? nResults <= count : index0 <= 0) return undefined;
+  const index = dir > 0 ? index0 + count : count > index0 ? 0 : index0 - count;
+  url.searchParams.set('index', index);
+  url.searchParams.set('count', count);
+  return url.pathname + url.search;
+}
+
+function selfResult(req, result, method=undefined) {
+  return { result, _links: { self: { href: selfLink(req), method } } };
+}
+
+
+function pageResult(req, results) {
+  const nResults = results.length;
+  const result = results.map(r => {
+    return { ...r, _links: { self: selfLink(req, r.userId) } };
+  });
+  const links = { self: { href: selfLink(req), } };
+  const next = pageLink(req, nResults, +1);
+  if (next) links.next = { href: next };
+  const prev = pageLink(req, nResults, -1);
+  if (prev) links.prev = { href: prev };
+  const count = req.query.count ?? DEFAULT_COUNT;
+  return { result: result.slice(0, count), _links: links };
+}
 
 /** Handler to log current request URL on stderr and transfer control
  *  to next handler in handler chain.
