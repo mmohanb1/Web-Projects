@@ -66,7 +66,7 @@ function setupRoutes(app) {
   console.log('in setup routes');
   app.post(`${base}/images`, doPostTestImage(app));
 
-  app.get(`${base}/images/:id`, dummyHandler(app));
+  app.get(`${base}/images/:id`, doGetTestImage(app));
 
   
   
@@ -97,7 +97,24 @@ function doPostTestImage(app) {
     }
   });
 }
-
+function doGetTestImage(app) {
+  return (async function(req, res) {
+    try {
+    console.log(req.params.id);
+      const result = await app.locals.dao.get(req.params.id, true);
+      if (result.hasErrors) throw result;
+//      const features = result.features;
+//console.log(result);
+      res.json({features: result.val.features, label: result.val.label});
+      //res.location(userId);
+//      res.json(selfResult(req, result.val));
+    }
+    catch(err) {
+      const mapped = mapResultErrors(err);
+      res.status(mapped.status).json(mapped);
+    }
+  });
+}
 //dummy handler to test initial routing and to use as a template
 //for real handlers.  Remove on project completion.
 function dummyHandler(app) {
