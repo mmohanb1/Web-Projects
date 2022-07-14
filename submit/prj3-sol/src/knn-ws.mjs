@@ -21,18 +21,28 @@ export const DEFAULT_COUNT = 5;
  */
 export default async function serve(knnConfig, dao, data) {
   try {
-    const app = express();
+   // const app = express();
 
     //TODO: squirrel away knnConfig params and dao in app.locals.
-
-
+    const app = express();
+    app.locals.dao = dao;
+    app.locals.base = knnConfig.base;
+    app.locals.k = knnConfig.k;
+   // console.log(data);
+//    console.log(`knnConfig = ${knnConfig}`);
     if (data) {
+       dao.clear();
       //TODO: load data into dao
-
+      for(const lf of data)
+      {
+	const id = await dao.add(lf.features, true, lf.labels);	
+      }
+      
     }
 
     //TODO: get all training results from dao and squirrel away in app.locals
-
+    app.locals.training_images = await dao.getAllTrainingFeatures();
+//    console.log(app.locals.training_images.length);
     //set up routes
     setupRoutes(app);
 
@@ -52,7 +62,14 @@ function setupRoutes(app) {
 
   //uncomment to log requested URLs on server stderr
   //app.use(doLogRequest(app));
+  console.log(`base = ${base}/images`);
+  console.log('in setup routes');
+  //app.post(`${base}`, doPostTestImage(app));
+  app.post(`${base}/images`, dummyHandler(app));
+  app.get(`${base}/images/:id`, dummyHandler(app));
 
+  
+  
   //TODO: add knn routes here
 
   //must be last
@@ -60,12 +77,30 @@ function setupRoutes(app) {
   app.use(doErrors(app));
 }
 
+function doRegisterUser(app) {
+  return (async function(req, res) {
+    try {
+      const userInfo = req.body;
+      const result = await app.locals.model.register(userInfo);
+      if (result.hasErrors) throw result;
+      const registeredUser = result.val;
+      const { userId } = registeredUser;
+      res.location(selfLink(req, userId));
+      res.status(STATUS.CREATED).json(selfResult(req, registeredUser, 'POST'));
+    }
+    catch(err) {
+      const mapped = mapResultErrors(err);
+      res.status(mapped.status).json(mapped);
+    }
+  });
+}
 
 //dummy handler to test initial routing and to use as a template
 //for real handlers.  Remove on project completion.
 function dummyHandler(app) {
   return (async function(req, res) {
     try {
+
       res.json({status: 'TODO'});
     }
     catch(err) {
