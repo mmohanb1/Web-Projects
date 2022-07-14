@@ -6,6 +6,7 @@ import STATUS from 'http-status';
 
 import { ok, err } from 'cs544-js-utils';
 import { knn } from 'prj1-sol';
+
 import { uint8ArrayToB64, b64ToUint8Array } from 'prj2-sol';
 
 import fs from 'fs';
@@ -68,7 +69,7 @@ function setupRoutes(app) {
  // console.log('in setup routes');
   app.post(`${base}/images`, doPostTestImage(app));
   app.get(`${base}/images/:id`, doGetTestImage(app));
-  app.get(`${base}/labels/:id`, doKnn(app));
+  app.get(`${base}/labels/:testId`, doKnn(app));
   
   
   //TODO: add knn routes here
@@ -119,17 +120,19 @@ function doGetTestImage(app) {
 function doKnn(app) {
   return (async function(req, res) {
     try {
-  //  console.log(`req.params.id = ${req.params.id}`);
-      const result = await app.locals.dao.get(req.params.id, false);
+  // console.log(`req.params.testId = ${req.params.testId}`);
+      const result = await app.locals.dao.get(req.params.testId, false);
       if (result.hasErrors) throw result;
 
       const testFeatures = result.val.features;
     //  console.log(`testFeatures = ${testFeatures}`);
       const trainingFeatures = app.locals.training_images.val;
     //  console.log(`trainingFeatures.length = ${trainingFeatures.length}`);
+    //console.log(`app.locals.k = ${app.locals.k}`);
       const result1 = await knn(testFeatures, trainingFeatures, app.locals.k);
     //  console.log(`result1 index of knn = ${result1.val[1]}`);
       const trainingImageClosest = trainingFeatures[result1.val[1]];
+//      console.log(`{id: ${trainingImageClosest.id}, label: ${trainingImageClosest.label}`);
 //console.log(result);
       res.json({id: trainingImageClosest.id, label: trainingImageClosest.label});
       //res.location(userId);
@@ -277,4 +280,3 @@ function mapResultErrors(err) {
   if (status === STATUS.INTERNAL_SERVER_ERROR)  console.error(errors);
   return { status, errors, };
 } 
-
