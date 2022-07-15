@@ -43,7 +43,8 @@ describe('KNN Web Services', () => {
   }
   
   async function labelImage(ws, uint8Bytes, k=3) {
-    const id = await postImage(ws, uint8Bytes);
+//console.log(`k = ${k}`);
+	  const id = await postImage(ws, uint8Bytes);
     const get = await ws.get(`${BASE}/labels/${id}?k=${k}`);
     expect(get.status).to.equal(STATUS.OK);
     const label = get.body.label;

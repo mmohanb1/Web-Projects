@@ -31,7 +31,7 @@ export default async function serve(knnConfig, dao, data) {
     app.locals.k = knnConfig.k;
 //    console.log(data.length);
  //       console.log(data);
-//    console.log(`knnConfig = ${knnConfig}`);
+ //   console.log(`app.locals.k = ${app.locals.k}`);
     if (data) {
        dao.clear();
       //TODO: load data into dao
@@ -120,16 +120,17 @@ function doGetTestImage(app) {
 function doKnn(app) {
   return (async function(req, res) {
     try {
-  // console.log(`req.params.testId = ${req.params.testId}`);
+//   console.log(`req.query.k = ${req.query.k}`);
       const result = await app.locals.dao.get(req.params.testId, false);
       if (result.hasErrors) throw result;
-      
+      if(req.query.k)
+	app.locals.k = req.query.k;
       const testFeatures = result.val.features;
-   //   console.log(`testFeatures.length = ${testFeatures.length}`);
+   //   console.log(`testFeatures = ${testFeatures}`);
       const trainingFeatures = app.locals.training_images.val;
       for(const trainingF of trainingFeatures)
       {
-//	console.log(`trainingF.features.length = ${trainingF.features.length}, testFeatures.length = ${testFeatures.length}`);
+//	console.log(`trainingF.features = ${trainingF.features}`);
 	if(trainingF.features.length !== testFeatures.length)
 	   throw err('Test & Training # bytes dont match',{code: 'BAD_FMT'});
       }
