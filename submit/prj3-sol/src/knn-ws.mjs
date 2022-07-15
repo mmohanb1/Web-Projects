@@ -123,10 +123,16 @@ function doKnn(app) {
   // console.log(`req.params.testId = ${req.params.testId}`);
       const result = await app.locals.dao.get(req.params.testId, false);
       if (result.hasErrors) throw result;
-
+      
       const testFeatures = result.val.features;
-    //  console.log(`testFeatures = ${testFeatures}`);
+   //   console.log(`testFeatures.length = ${testFeatures.length}`);
       const trainingFeatures = app.locals.training_images.val;
+      for(const trainingF of trainingFeatures)
+      {
+//	console.log(`trainingF.features.length = ${trainingF.features.length}, testFeatures.length = ${testFeatures.length}`);
+	if(trainingF.features.length !== testFeatures.length)
+	   throw err('Test & Training # bytes dont match',{code: 'BAD_FMT'});
+      }
     //  console.log(`trainingFeatures.length = ${trainingFeatures.length}`);
     //console.log(`app.locals.k = ${app.locals.k}`);
       const result1 = await knn(testFeatures, trainingFeatures, app.locals.k);
@@ -228,6 +234,18 @@ function do404(app) {
   };
 }
 
+//function doBadFmt(app) {
+ // return async function(req, res) {
+   // const message = `Test & Training # bytes dont match`;
+//    const result = {
+//      status: STATUS.BAD_REQUEST,
+  //    errors: [	{ options: { code: 'BAD_FMT' }, message, }, ],
+//    };
+//    res.status(STATUS.BAD_REQUEST).json(result);
+//  };
+//}
+
+
 
 /** Ensures a server error results in nice JSON sent back to client
  *  with details logged on console.
@@ -254,6 +272,7 @@ const ERROR_MAP = {
   AUTH: STATUS.UNAUTHORIZED,
   DB: STATUS.INTERNAL_SERVER_ERROR,
   INTERNAL: STATUS.INTERNAL_SERVER_ERROR,
+
 }
 
 /** Return first status corresponding to first options.code in
