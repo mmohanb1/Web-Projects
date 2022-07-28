@@ -69,7 +69,7 @@ class DigitImageRecognizer extends HTMLElement {
     ctx.strokeStyle = FG_COLOR;
     ctx.lineWidth = 1;
 
-   
+    draw(ctx, {x: 0, y: 10}, {x: 10, y: 10});
     /** set up an event handler for the clear button being clicked */
     //TODO
     const clearId = shadow.querySelector("#clear");
@@ -134,7 +134,8 @@ class DigitImageRecognizer extends HTMLElement {
    *  previously determined label 
    */
   resetApp(ctx)  {
-    console.log('TODO resetApp()');
+//    console.log('TODO resetApp()');
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   }
 
   /** Label the image in the canvas specified by canvas corresponding
@@ -161,6 +162,11 @@ class DigitImageRecognizer extends HTMLElement {
 /** Draw a line from {x, y} point pt0 to {x, y} point pt1 in ctx */
 function draw(ctx, pt0, pt1) {
   //TODO
+  ctx.beginPath();
+ctx.strokeStyle = 'blue';
+ctx.moveTo(pt0.x, pt0.y);
+ctx.lineTo(pt1.x, pt1.y);
+ctx.stroke();
 }
 	
 /** Returns the {x, y} coordinates of event ev relative to canvas in
