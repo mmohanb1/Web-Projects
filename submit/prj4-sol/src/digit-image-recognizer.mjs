@@ -69,32 +69,15 @@ class DigitImageRecognizer extends HTMLElement {
     ctx.strokeStyle = FG_COLOR;
     ctx.lineWidth = 1;
 
-   
     /** set up an event handler for the clear button being clicked */
     //TODO
-    const clearId = shadow.querySelector("#clear");
-
-    console.log(clearId);
-    clearId.addEventListener("click", () =>{this.resetApp(ctx);});
-    
 
     /** set up an event handler for the recognize button being clicked. */
     //TODO
-    const recognizeId = shadow.querySelector("#recognize");
-
-    console.log(recognizeId);
-    recognizeId.addEventListener("click", () =>{this.recognize(ctx);});
 
     /** set up an event handler for the pen-width being changed. */
     //TODO
-    const penWidthId = shadow.querySelector("#pen-width");
-    const option = penWidthId.options[penWidthId.selectedIndex];
-//    console.log(option.text);
-    penWidthId.addEventListener("change", ()=>{ctx.lineWidth=option.text});
-    
-    console.log(ctx.lineWidth);
-    
-    
+
     /** true if the mouse button is currently pressed within the canvas */
     let mouseDown = false;
 
@@ -173,7 +156,5 @@ function eventCanvasCoord(canvas, ev) {
 }
   
 customElements.define('digit-image-recognizer', DigitImageRecognizer);
-
-
 
 
