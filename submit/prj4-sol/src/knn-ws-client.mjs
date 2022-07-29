@@ -5,8 +5,12 @@ export default function makeKnnWsClient(wsUrl) {
 }
 
 class KnnWsClient {
+
   constructor(wsUrl) {
     //TODO
+    console.log('constructor called, url = '+wsUrl);
+    this.wsUrl = wsUrl;
+//    this.reponse
   }
 
   /** Given a base64 encoding b64Img of an MNIST compatible test
@@ -22,6 +26,20 @@ class KnnWsClient {
    */
   async classify(b64Img) {
     //TODO
+    console.log('classify called.., b64Img = '+b64Img);
+    try {
+    fetch(this.wsUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(b64Img)
+    }).then((res) => {this.response = res;})
+    }
+    catch(e)
+    {
+//	return err(e.status, e.c);
+    }
   }
 
   /** Return a Result containing the base-64 representation of

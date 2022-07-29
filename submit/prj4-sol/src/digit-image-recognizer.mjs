@@ -160,7 +160,8 @@ class DigitImageRecognizer extends HTMLElement {
     });
     /** Create a new KnnWsClient instance in this */
     //TODO
-
+        this.knnWsObj = makeKnnWsClient(wsUrl);
+	//console.log('-----------------'+knnWsObj.wsUrl);
   }
 
   /** Clear canvas specified by graphics context ctx and any
@@ -178,6 +179,10 @@ class DigitImageRecognizer extends HTMLElement {
    */
   async recognize(ctx) {
     console.log('TODO recognize()');
+
+    const b64Img = canvasToMnistB64(ctx);
+    const response = await this.knnWsObj.classify(b64Img);
+    shadow.querySelector('#knn-label').innerHTML = response.label;
   }
 
   /** given a result for which hasErrors is true, report all errors 
