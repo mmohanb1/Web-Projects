@@ -29,25 +29,36 @@ class KnnWsClient {
   async classify(b64Img) {
     //TODO
     console.log('classify called.., url = '+this.wsUrl);
-    try {
+//    try {
     const resObj = await fetch(this.wsUrl+'/knn/images', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(b64Img)
-    }).then((res) => res.json());
+    }).then((res) => {
+    if(res.ok)
+     {return res.json()}
+     throw new Error('Fetch failed');
+    }).catch((error) => {return err('fetch failed', {code: 'BAD_REQUEST'})});
+    if(resObj.hasErrors)
+     return err('fetch failed', {code: 'BAD_REQUEST'});
+    console.log(`resObj => ${resObj}`);
     console.log(`testId = ${resObj.id}`);
+    
     const testId = resObj.id;
-    const resultObj = await fetch(this.wsUrl+'/knn/labels/'+testId).then((res1) => res1.json());
-
+    const resultObj = await fetch(this.wsUrl+'/knn/labels/'+testId).then((res1) =>
+    {
+     if(res1.ok)
+      {return res1.json()}
+      throw new Error('fetch failed');
+    }).catch((error) => {err('fetch failed', {code: 'BAD_REQUEST'})});
+     if(resultObj.hasErrors)
+     return err('fetch failed', {code: 'BAD_REQUEST'});
     console.log(`..........................${resultObj}`);
     return resultObj;
-    }
-    catch(e)
-    {
-	return err(e.toString(), {code: ''});
-    }
+ //   }
+
   }
 
   /** Return a Result containing the base-64 representation of

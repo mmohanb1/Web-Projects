@@ -44,9 +44,14 @@ class DigitImageRecognizer extends HTMLElement {
 
   static get observedAttributes() { return ['ws-url']; }
   attributeChangedCallback(name, _oldValue, newValue) {
+  console.log(`${name} attrribute changed`);
+  if(name === 'ws-url')
+  {
+   
+    this.init(newValue);
     //TODO
   }
-
+}
 
   /** Initialize canvas attributes, set up event handlers and attach a
    *  knn web services client for wsUrl to this.  Note that the
@@ -74,7 +79,7 @@ class DigitImageRecognizer extends HTMLElement {
     //TODO
     const clearId = shadow.querySelector("#clear");
 
-    console.log(clearId);
+  //  console.log(clearId);
     clearId.addEventListener("click", () =>{this.resetApp(ctx);});
     
 
@@ -82,7 +87,7 @@ class DigitImageRecognizer extends HTMLElement {
     //TODO
     const recognizeId = shadow.querySelector("#recognize");
 
-    console.log(recognizeId);
+//    console.log(recognizeId);
     recognizeId.addEventListener("click", () =>{this.recognize(ctx);});
 
     /** set up an event handler for the pen-width being changed. */
@@ -170,6 +175,7 @@ class DigitImageRecognizer extends HTMLElement {
   resetApp(ctx)  {
 //    console.log('TODO resetApp()');
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      this.shadowRoot.querySelector('#knn-label').innerHTML = '';      
   }
 
   /** Label the image in the canvas specified by canvas corresponding
@@ -184,12 +190,18 @@ class DigitImageRecognizer extends HTMLElement {
 
     const b64Img = canvasToMnistB64(ctx);
     const result = await this.knnWsObj.classify(b64Img);
-    console.log('result = '+result);
-    this.shadowRoot.querySelector('#knn-label').innerHTML = result.label;
+
+//    console.log(`----result = ${result}`);
+    console.log(`result.label = ${result.label}`);
+
+    if(!result || !result.label)
+    	this.shadowRoot.querySelector('#knn-label').innerHTML = '<div style="color:red">fetch failed</div>';
+    else
+	this.shadowRoot.querySelector('#knn-label').innerHTML = result.label;
     }
     catch(e)
     {
-	alert(`${e.toString()}`);
+	console.error(e.message);
     }
   }
 
