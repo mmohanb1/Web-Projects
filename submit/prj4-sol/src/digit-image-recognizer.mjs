@@ -69,7 +69,7 @@ class DigitImageRecognizer extends HTMLElement {
     ctx.strokeStyle = FG_COLOR;
     ctx.lineWidth = 1;
 
-    draw(ctx, {x: 0, y: 10}, {x: 10, y: 10});
+//    draw(ctx, {x: 0, y: 10}, {x: 10, y: 10});
     /** set up an event handler for the clear button being clicked */
     //TODO
     const clearId = shadow.querySelector("#clear");
@@ -103,11 +103,18 @@ class DigitImageRecognizer extends HTMLElement {
      *  coordinates.
      */
     let last = { x: 0, y: 0 };
-
+    let startDrawCoords = {x: 0, y: 0};
+    let currDrawCoords = {x: 0, y: 0};
     /** set up an event handler for the mouse button being pressed within
      *  the canvas.
      */
     //TODO
+    const canvasId = shadow.querySelector('#img-canvas');
+    canvasId.addEventListener("mousedown",(e) => {
+    mouseDown = true;
+    startDrawCoords = eventCanvasCoord(canvas,e);
+    console.log(startDrawCoords);
+    });
 
     
     /** set up an event handler for the mouse button being moved within
@@ -115,16 +122,39 @@ class DigitImageRecognizer extends HTMLElement {
      */
     //TODO
 
+	canvasId.addEventListener("mousemove", (e) => {
+	    if(mouseDown)
+    	    {
+	    //    draw(ctx, {x: 0, y: 10}, {x: 10, y: 10});
+	     currDrawCoords = eventCanvasCoord(canvas, e);
+	      draw(ctx, startDrawCoords, currDrawCoords);
+	      startDrawCoords = currDrawCoords;
+	    }
+	});	
+    
+
     /** set up an event handler for the mouse button being released within
      *  the canvas.
      */
     //TODO
+    canvasId.addEventListener("mouseup", (e) => {
+    if(mouseDown)
+    {
+        currDrawCoords = eventCanvasCoord(canvas, e);
+	draw(ctx, startDrawCoords, currDrawCoords);
+	startDrawCoords = {x: 0, y: 0};
+	mouseDown = false;
+    }
+    });
 
     /** set up an event handler for the mouse button being moved off
      *  the canvas.
      */
     //TODO
-
+    canvasId.addEventListener("mouseleave", (e) => {
+    	startDrawCoords = {x: 0, y: 0};
+	mouseDown = false;	
+    });
     /** Create a new KnnWsClient instance in this */
     //TODO
 
