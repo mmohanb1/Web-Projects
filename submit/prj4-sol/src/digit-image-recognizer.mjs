@@ -88,11 +88,14 @@ class DigitImageRecognizer extends HTMLElement {
     /** set up an event handler for the pen-width being changed. */
     //TODO
     const penWidthId = shadow.querySelector("#pen-width");
-    const option = penWidthId.options[penWidthId.selectedIndex];
+  //  const option = penWidthId.options[penWidthId.selectedIndex];
 //    console.log(option.text);
-    penWidthId.addEventListener("change", ()=>{ctx.lineWidth=option.text});
-    
+    penWidthId.addEventListener("change", (e)=>{
+    ctx.lineWidth=e.target.value;
     console.log(ctx.lineWidth);
+    });
+    
+    //console.log(ctx.lineWidth);
     
     
     /** true if the mouse button is currently pressed within the canvas */
