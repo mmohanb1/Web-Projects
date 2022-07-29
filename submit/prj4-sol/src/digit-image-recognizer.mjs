@@ -178,11 +178,19 @@ class DigitImageRecognizer extends HTMLElement {
    *  area of the app.  Display any errors encountered.
    */
   async recognize(ctx) {
+  try
+  {
     console.log('TODO recognize()');
 
     const b64Img = canvasToMnistB64(ctx);
-    const response = await this.knnWsObj.classify(b64Img);
-    shadow.querySelector('#knn-label').innerHTML = response.label;
+    const result = await this.knnWsObj.classify(b64Img);
+    console.log('result = '+result);
+    this.shadowRoot.querySelector('#knn-label').innerHTML = result.label;
+    }
+    catch(e)
+    {
+	alert(`${e.toString()}`);
+    }
   }
 
   /** given a result for which hasErrors is true, report all errors 

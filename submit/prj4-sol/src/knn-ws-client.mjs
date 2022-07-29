@@ -10,6 +10,8 @@ class KnnWsClient {
     //TODO
     console.log('constructor called, url = '+wsUrl);
     this.wsUrl = wsUrl;
+    this.result = {};
+//    this.r = '';
 //    this.reponse
   }
 
@@ -26,19 +28,25 @@ class KnnWsClient {
    */
   async classify(b64Img) {
     //TODO
-    console.log('classify called.., b64Img = '+b64Img);
+    console.log('classify called.., url = '+this.wsUrl);
     try {
-    fetch(this.wsUrl, {
+    const resObj = await fetch(this.wsUrl+'/knn/images', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(b64Img)
-    }).then((res) => {this.response = res;})
+    }).then((res) => res.json());
+    console.log(`testId = ${resObj.id}`);
+    const testId = resObj.id;
+    const resultObj = await fetch(this.wsUrl+'/knn/labels/'+testId).then((res1) => res1.json());
+
+    console.log(`..........................${resultObj}`);
+    return resultObj;
     }
     catch(e)
     {
-//	return err(e.status, e.c);
+	return err(e.toString(), {code: ''});
     }
   }
 
