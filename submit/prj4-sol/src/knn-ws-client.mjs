@@ -41,8 +41,10 @@ class KnnWsClient {
      {return res.json()}
      throw new Error('Fetch failed');
     }).catch((error) => {return err('fetch failed', {code: 'BAD_REQUEST'})});
-    if(resObj.hasErrors)
+    if(resObj.hasErrors){
+    console.log('has errors*************')
      return err('fetch failed', {code: 'BAD_REQUEST'});
+     }
     console.log(`resObj => ${resObj}`);
     console.log(`testId = ${resObj.id}`);
     
@@ -53,8 +55,10 @@ class KnnWsClient {
       {return res1.json()}
       throw new Error('fetch failed');
     }).catch((error) => {err('fetch failed', {code: 'BAD_REQUEST'})});
-     if(resultObj.hasErrors)
+     if(resultObj.hasErrors){
+     console.log(`has errors************`);
      return err('fetch failed', {code: 'BAD_REQUEST'});
+     }
     console.log(`..........................${resultObj}`);
     return resultObj;
  //   }

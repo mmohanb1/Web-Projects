@@ -191,10 +191,10 @@ class DigitImageRecognizer extends HTMLElement {
     const b64Img = canvasToMnistB64(ctx);
     const result = await this.knnWsObj.classify(b64Img);
 
-//    console.log(`----result = ${result}`);
+    console.log(`----result.hasErrors = ${result.hasErrors}`);
     console.log(`result.label = ${result.label}`);
 
-    if(!result || !result.label)
+    if(!result || result.hasErrors || !result.label)
     	this.shadowRoot.querySelector('#knn-label').innerHTML = '<div style="color:red">fetch failed</div>';
     else
 	this.shadowRoot.querySelector('#knn-label').innerHTML = result.label;
