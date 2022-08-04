@@ -17,6 +17,7 @@ export default function App() {
     const [label, setLabel] = useState('');
     const [wsUrl, setWsUrl] = useState(DEFAULT_WS_URL);
     const [knnWsObj, setKnnObj] = useState(makeKnnWsClient(DEFAULT_WS_URL));
+  //  const [penWidth, setPenWidth] = useState(1);
   const canvasRef = React.useRef();
     const contextRef = React.useRef();
     const checking = 10;
@@ -114,7 +115,12 @@ export default function App() {
       setLabel('');
   };
 
-    
+    const penWidthChange = (width) => {
+	console.log(`pen width = ${width}, context.linewidth = ${contextRef.current.lineWidth}`);
+//	setPenWidth(width);
+	contextRef.current.lineWidth = width;
+		console.log(`context.linewidth changed= ${contextRef.current.lineWidth}`);
+    }
   return (
       <div align='center'>
 	  <div>
@@ -133,8 +139,8 @@ export default function App() {
 	  <div>
 	      <button id="clear" onClick={clearCanvas}><slot name="clear">Clear Area</slot></button>
 	      <button id="recognize" onClick={recognize}><slot name="recognize">Recognize</slot></button>
-        Pen width : <select id="pen-width">
-            <option value="1" selected="selected">1</option>
+        Pen width : <select id="pen-width" onChange={e => {penWidthChange(e.target.value)}}>
+			<option value="1" selected="selected">1</option>
             <option value="2">2</option>
         </select>
 	<p>
