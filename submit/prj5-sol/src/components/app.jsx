@@ -15,26 +15,27 @@ export default function App() {
 
     const [isDrawing, setIsDrawing] = useState(false);
     const [label, setLabel] = useState('');
+    const [labelColor, setLabelColor] = useState('black');
     const [wsUrl, setWsUrl] = useState(DEFAULT_WS_URL);
     const [knnWsObj, setKnnObj] = useState(makeKnnWsClient(DEFAULT_WS_URL));
   //  const [penWidth, setPenWidth] = useState(1);
-  const canvasRef = React.useRef();
+    const canvasRef = React.useRef();
     const contextRef = React.useRef();
     const checking = 10;
   //  console.log('CanvasProvider');
   //  const knnWsObj = makeKnnWsClient(DEFAULT_WS_URL);
 //    let label = '';
     useEffect(() => {
-      console.log('preparing canvas');
+  //    console.log('preparing canvas');
 	const canvas = canvasRef.current;
-	console.log(`canvas = ${canvas}`)
+//	console.log(`canvas = ${canvas}`)
 	canvas.width = DRAW.width;
-	console.log(`canvas.width = ${canvas.width}`)
-      canvas.height = DRAW.height;
-      canvas.style.width = `${ZOOM * DRAW.width}.px`;
+//	console.log(`canvas.width = ${canvas.width}`)
+        canvas.height = DRAW.height;
+        canvas.style.width = `${ZOOM * DRAW.width}.px`;
 	canvas.style.height = `${ZOOM * DRAW.height}px`;
-	      canvas.style.border = `2px solid black`;
-      const context = canvas.getContext("2d");
+        canvas.style.border = `2px solid black`;
+	const context = canvas.getContext("2d");
       
 
     context.lineCap = "round";
@@ -44,30 +45,39 @@ export default function App() {
     },[]);
 
     const resetWsUrl = (url) => {
-	console.log(`updated url => ${url}`);
+	//console.log(`updated url => ${url}`);
 	setWsUrl(url);
 	setKnnObj(makeKnnWsClient(url));
+	if(labelColor !== 'red')
+	   setLabelColor('black');
     }
   const recognize = async () => {
   try
   {
-    console.log('TODO recognize()');
+//    console.log('TODO recognize()');
 
     const b64Img = canvasToMnistB64(contextRef.current);
     const result = await knnWsObj.classify(b64Img);
-      console.log(`b64Img => ${b64Img}`)
-    console.log(`----result.hasErrors = ${result.hasErrors}`);
-    console.log(`result.label = ${result.label}`);
+   //   console.log(`b64Img => ${b64Img}`)
+//    console.log(`----result.hasErrors = ${result.hasErrors}`);
+  //  console.log(`result.label = ${result.label}`);
 
     if(!result || result.hasErrors || !result.label)
 	//	this.shadowRoot.querySelector('#knn-label').innerHTML = '<div style="color:red">fetch failed</div>';
-	setLabel('fetch failed');
-    else
+      {
+
+	  setLabel('fetch failed');
+	  setLabelColor('red');
+//	  console.log(`label color = ${labelColor}`);
+      }
+      else{
 	//	this.shadowRoot.querySelector('#knn-label').innerHTML = result.label;
+	setLabelColor('black');
 	setLabel(result.label);
 
-      console.log(`label = ${label}`);
-    }
+  //    console.log(`label = ${label}`);
+      }
+  }
     catch(e)
     {
 	console.error(e.message);
@@ -75,18 +85,18 @@ export default function App() {
   }
     
     const startDrawing = ({ nativeEvent }) => {
-	console.log(`canvasRef.current = ${canvasRef.current}`);
+//	console.log(`canvasRef.current = ${canvasRef.current}`);
             const { x, y } = eventCanvasCoord(canvasRef.current, nativeEvent);
-      console.log(`startDrawing`)
-    //const { offsetX, offsetY } = nativeEvent;
-      console.log(`x = ${x}, y=${y}`);
-      console.log(`contextRef.current.strokeStyle = ${contextRef.current.strokeStyle}, line width = ${contextRef.current.lineWidth}`)
+  //    console.log(`startDrawing`)
+    const { offsetX, offsetY } = nativeEvent;
+    //  console.log(`x = ${x}, y=${y}`);
+      //console.log(`contextRef.current.strokeStyle = ${contextRef.current.strokeStyle}, line width = ${contextRef.current.lineWidth}`)
     contextRef.current.beginPath();
     contextRef.current.moveTo(x, y);
     setIsDrawing(true);
   };
     const eventCanvasCoord = (canvas, ev) => {
-	console.log(`ev.pageX = ${ev.pageX}, ev.pageY = ${ev.pageY}, canvas.offsetTop = ${canvas.offsetTop}, canvas.offsetLeft = ${canvas.offsetLeft}, ZOOM = ${ZOOM}`);
+//	console.log(`ev.pageX = ${ev.pageX}, ev.pageY = ${ev.pageY}, canvas.offsetTop = ${canvas.offsetTop}, canvas.offsetLeft = ${canvas.offsetLeft}, ZOOM = ${ZOOM}`);
   const x = (ev.pageX - canvas.offsetLeft)/ZOOM;
 	const y = (ev.pageY - canvas.offsetTop)/ZOOM;
 //	console.log(`x = ${x}, y = ${y}`)
@@ -116,7 +126,7 @@ export default function App() {
   };
 
     const penWidthChange = (width) => {
-	console.log(`pen width = ${width}, context.linewidth = ${contextRef.current.lineWidth}`);
+//	console.log(`pen width = ${width}, context.linewidth = ${contextRef.current.lineWidth}`);
 //	setPenWidth(width);
 	contextRef.current.lineWidth = width;
 		console.log(`context.linewidth changed= ${contextRef.current.lineWidth}`);
@@ -144,7 +154,7 @@ export default function App() {
             <option value="2">2</option>
         </select>
 	<p>
-	    <strong>Label : </strong><span>{label}</span>
+	    <strong>Label : </strong><span style={{color: labelColor}}>{label}</span>
         </p>
 	      <ul id="errors"></ul>
 	      </div>
