@@ -1,6 +1,1 @@
-Name:		Murali Mohan Bugata
-B-Number:	B00927020
-Email:		mmohanb1@binghamton.edu
-
-Add text here as needed.
-
+Project 4 is to design a front end to draw and submit a number(test image) with canvas api and DOM api and test the image against mnist training images stored in DB consuming the rest api's developed in previous project
