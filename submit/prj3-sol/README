@@ -1,6 +1,1 @@
-Name:		Murali Mohan Bugata
-B-Number:	B00927020
-Email:		mmohanb1@binghamton.edu
-
-Add text here as needed.
-
+Project 3 is to create REST api's to find the knn label of a test image against training data stored in DB.
