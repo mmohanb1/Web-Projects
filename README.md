@@ -1,6 +1,3 @@
-# i544
-Name : Murali Mohan Bugata
-B# : B00927020
-Email : mmohanb1@binghamton.edu
+These are the 5 projects I completed in CS-544(Programming for the Web) course at Binghamton University under Prof. Zerksis Umrigar.
 
-Code Ref for react canvas: https://github.com/satansdeer/drawing-react-canvas 
+The content here is strictly for reference.
