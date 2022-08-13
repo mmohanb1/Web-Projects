@@ -1,1 +1,1 @@
-
+Project1 is to parse mnist format files and find the k nearest neighboring labels of test data against the training data
